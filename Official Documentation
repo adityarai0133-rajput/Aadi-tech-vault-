@@ -1,0 +1,27 @@
+OFFICIAL DOCUMENTATION: AADI-TECH-Vault v1.0
+
+1. INTRODUCTION
+AADI-TECH-Vault is a high-performance, local encryption utility designed for secure data management. It addresses the vulnerability of plain-text configuration files and personal documents by rebranding them into the secure .aadi format.
+
+2. THE 4WS ENGINEERING FRAMEWORK
+Before development, the project was mapped using the Aadi-Tech Systems' 4WS Canvas:
+- Who: Developers and Privacy-conscious users.
+- What: A file-level encryption engine.
+- Where: Local file systems (Cross-platform compatibility focus).
+- Why: To provide industrial-grade security on consumer-grade (low-end) hardware.
+
+3. FUNCTIONAL OVERVIEW
+- Input Module: Accepts any file format (PDF, JPG, TXT, ENV).
+- Processing Module: Implements encryption logic based on user-defined master keys.
+- Output Module: Generates a .aadi file that is unreadable by external viewers.
+- Decryption Module: Reverts .aadi files to their original state using the authenticated key.
+
+4. SYSTEM OPTIMIZATION
+The software is engineered for efficiency. Unlike modern resource-heavy applications, AADI-TECH-Vault maintains a minimal memory footprint, ensuring high-speed processing even on systems with limited RAM and CPU power.
+
+5. PUBLIC RELEASE NOTE
+This project is officially released as of April 2026. It marks a significant step for Aadi-Tech Systems in making security accessible to everyone.
+
+6. CONTRIBUTIONS & MENTORSHIP
+We welcome feedback from senior engineers. As a student-led initiative, Aadi-Tech Systems is focused on learning, growing, and refining software logic.
+
