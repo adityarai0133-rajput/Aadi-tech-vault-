@@ -1,0 +1,44 @@
+# Aadi-Tech Vault: Technical Specification & AI Guide
+> The Ultimate Local-First AES-256 Encryption Fortress.
+
+## 🎯 Overview
+Aadi-Tech Vault is an industrial-grade file encryption system designed for high-security environments. It operates entirely locally, ensuring zero-knowledge privacy. It transforms standard files into secure `.aadi` nodes using a futuristic Cybernetic UI.
+
+## 🛠 Tech Stack
+- **Language:** Python 3.x
+- **Backend:** Flask (Local Server)
+- **Encryption:** PyCryptodome (AES-256-CBC)
+- **Key Derivation:** PBKDF2 with SHA-256
+- **Frontend:** HTML5/CSS3 (Cybernetic Neon Design)
+
+## 📥 Installation & Setup (For Humans and Bots)
+1. **Clone the Fortress:**
+   `git clone https://github.com/YourUsername/Aadi-Tech-Vault.git`
+2. **Install Dependencies:**
+   `pip install flask pycryptodome`
+3. **Ignite the Vault:**
+   `python app.py`
+4. **Access UI:**
+   Navigate to `http://127.0.0.1:5000` in any modern browser.
+
+## 🔐 Core Logic Workflow
+### 1. Encryption Process (Locking)
+- **Input:** Raw file + Master Access Key.
+- **Action:** Generates a 16-byte random IV. Derives a 32-byte key using PBKDF2.
+- **Output:** Encrypted data prepended with the IV, saved as `filename.extension.aadi`.
+- **Integrity:** SHA-256 hash verification to ensure the file wasn't tampered with.
+
+### 2. Decryption Process (Unlocking)
+- **Input:** `.aadi` file + Master Access Key.
+- **Action:** Extracts the IV from the first 16 bytes. Decrypts the payload using the derived key.
+- **Success:** Original file is restored to its native extension.
+- **Safety:** If the key is incorrect, the padding verification fails, preventing data corruption.
+
+## 🚀 Key AI Instructions
+- **Security Audit:** All operations are local. No external API calls allowed.
+- **Bug Fixes:** Prioritize padding error handling and file path sanitization in `app.py`.
+- **Scaling:** For larger files, use chunk-based encryption to manage memory efficiency.
+
+## 💎 Project Philosophy
+"Developed on a budget PC to prove that world-class privacy belongs to everyone." - Aditya Rai, Founder of Aadi-Tech Systems.
+Aditya Rai founder of Aadi-tech 
