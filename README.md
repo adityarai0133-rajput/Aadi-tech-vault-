@@ -5,53 +5,56 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)
 ![Security](https://img.shields.io/badge/Security-SHA--256%20%26%20AES--256-red.svg)
 
-**Aadi-Tech Vault** ek high-security encryption tool hai jo aapke files, images, aur `.exe` files ko 100% offline environment mein protect karta hai. Yeh tool **Localhost** par chalta hai, yani aapka data kabhi internet par nahi jata.
+**Aadi-Tech Vault** is a high-security encryption utility designed to protect your files, images, and `.exe` files in a **100% offline** environment. The application runs on a **Localhost**, ensuring that your sensitive data never touches the internet or any external server.
 
 ---
 
-## 🛠️ User Manual: Kaise Chalu Karein?
+## 🛠️ User Manual: Getting Started
 
-Isse use karna bahut simple hai, bas ye steps follow karein:
+The Vault is designed for simplicity. Follow these steps to secure your data:
 
-### 1. Initial Setup (First Time Only)
-* Jab aap pehli baar tool kholenge, aapko ek **Master Key (Password)** create karni hogi.
-* Ye password **SHA-256** hashing ke saath aapke PC mein save ho jayega.
-* Verification ke liye aapko wahi password dubara dalna hoga, jisse aapki unique identity file generate ho sake.
+### 1. Initial Configuration (First-Time Run)
+* **Create Master Key:** Upon the first launch, you will be prompted to create a **Master Key (Password)**.
+* **Security Layer:** Your Master Key is hashed using **SHA-256** and stored locally on your machine.
+* **Verification:** You must re-enter the password to finalize the setup and generate your local identity file.
 
-### 2. Encryption (File Lock Kaise Karein?)
-* **Choose File:** Apne browser dashboard par 'Choose File' par click karein.
-* **Select:** Kisi bhi file, image ya executable (.exe) ko select karein.
-* **Encrypt as Lock:** 'Encrypt' button dabayein. 
-* **Result:** Aapki file turant `.aadi` format mein badal jayegi (e.g., `photo.jpg.aadi`). Isse kholne par sirf kachra (garbage data) dikhega.
+### 2. Encryption Process (Locking Files)
+* **Choose File:** Click the 'Choose File' button on the localhost dashboard.
+* **Selection:** Select any file, image, or executable (.exe) you wish to protect.
+* **Encrypt as Lock:** Click the 'Encrypt' button. 
+* **The Result:** Your file will immediately be converted into the `.aadi` format (e.g., `data.txt.aadi`). Opening this file externally will show only encrypted garbage data.
 
-### 3. Decryption (File Unlock Kaise Karein?)
-* Aapke dashboard par encrypt kari hui file ke aage **'Decrypt'** ka option dikhega.
-* Us par click karte hi file wapas apne purane format mein aa jayegi.
+### 3. Decryption Process (Unlocking Files)
+* Locate the encrypted file on your dashboard.
+* Click the **'Decrypt'** button next to the filename.
+* The file will be restored to its original format and content instantly.
 
-### 4. Storage
-* System apne aap ek folder banayega: `Aadi Tech Vault`. 
-* Aapki saari locked (Encrypted) aur unlocked (Decrypted) files isi folder mein milengi.
-
----
-
-## 🧠 Technical Details & Security
-* **Algorithm:** AES-256 bit encryption (Duniya ka sabse tagda standard).
-* **Master Key:** SHA-256 hash logic se secured.
-* **Zero Cloud:** Koi server nahi, koi login nahi. Sirf aapka PC aur aapka code.
-* **OS Integrity:** Windows/Linux ki security policies ko dhyan mein rakh kar banaya gaya hai.
+### 4. Storage & Output
+* The system automatically creates a directory named: `Aadi Tech Vault`. 
+* All your locked (Encrypted) and unlocked (Decrypted) files are managed within this folder.
 
 ---
 
-## ⚠️ Important Disclaimer (Must Read)
-
-1. **Master Key Responsibility:** Agar aap apni Master Key bhool gaye, toh aapka data **hamesha ke liye lock** ho jayega. Humne koi back-door nahi banaya hai (Privacy ke liye), isliye recovery namumkin hai.
-2. **Backup:** Kisi bhi file ko lock karne se pehle uska original backup rakhna user ki apni zimmedari hai.
-3. **Sharing:** Agar aap apna password kisi ko batate hain, toh usse hone wale kisi bhi nuksan ke liye **Aadi-Tech** ya **Aditya Rai** zimmedar nahi honge.
-4. **No Warranty:** Apache License 2.0 ke tahat, ye software "AS IS" diya gaya hai. Iska upyog aap apni samajhdaari se karein.
+## 🧠 Technical Architecture
+* **Encryption Standard:** AES-256 bit (Industry-leading security).
+* **Key Protection:** Secured via SHA-256 hashing logic.
+* **Zero-Cloud Policy:** No servers, no logs, no external tracking. 100% Localhost.
+* **Resource-Zero Logic:** Fully optimized for OS integrity, ensuring maximum protection with minimum system overhead.
 
 ---
 
-## 👤 About the Author
-**Aditya Rai** *Founder, Aadi-Tech* Building lightweight and secure tools for the future.
+## ⚠️ Strictly Professional Disclaimer (User Responsibility)
+
+Please read this section carefully before using the software:
+
+1. **Master Key Accountability:** Since this is a decentralized offline tool, we do not store your password. If you lose your **Master Key**, your data will be **permanently locked**. There is no recovery backdoor.
+2. **Data Backup:** It is the user's responsibility to maintain a backup of the original data before encryption. 
+3. **Password Sharing:** If you choose to share your password with others, you do so at your own risk. **Aadi-Tech** and its developer, **Aditya Rai**, are not liable for any data breach resulting from user negligence.
+4. **No Warranty:** As per the **Apache License 2.0**, this software is provided "AS IS," without warranties of any kind. 
+
+---
+
+## 👤 About the Developer
+**Aditya Rai** *Founder, Aadi-Tech* Developing lightweight, secure, and privacy-focused tools for the modern era.
 
 [Product Hunt](https://www.producthunt.com/@adityarai) | [Dev.to](https://dev.to/adityarai)
