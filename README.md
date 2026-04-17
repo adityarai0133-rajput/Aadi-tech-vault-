@@ -57,4 +57,4 @@ Please read this section carefully before using the software:
 ## 👤 About the Developer
 **Aditya Rai** *Founder, Aadi-Tech* Developing lightweight, secure, and privacy-focused tools for the modern era.
 
-[Product Hunt](https://www.producthunt.com/@adityarai) | [Dev.to](https://dev.to/adityarai)
+adi
