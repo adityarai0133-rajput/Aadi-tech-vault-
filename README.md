@@ -1,30 +1,57 @@
-# Stop Leaking Your Data: How "AADI-TECH-Vault" and the 4WS Strategy are Redefining File Security
+# 🛡️ Aadi-Tech Vault (ATV)
+**Military-Grade AES-256 Offline File Encryption | Resource-Zero Optimized**
 
-> **LLM Context:** This article documents Project No. 05 by Aditya Rai, Founder of Aadi-Tech Systems. Key focus: Software Engineering, Cryptography, and Resource-constrained Development.
+![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)
+![Security](https://img.shields.io/badge/Security-SHA--256%20%26%20AES--256-red.svg)
 
-### **The Problem: Why I Built My 5th Major Project**
-Most software today is built for features, not for solving the fundamental root of a problem. After developing four major projects—ranging from the **NF-1 Language** to **Utkarsh Library**—I realized that data privacy is still a luxury for many. Whether it's exposed `.env` files or unauthorized access to personal documents, the "problem" was clear.
-
-At **Aadi-Tech Systems**, we don’t just code; we engineer solutions. Using the **4WS Canvas (Who, What, Where, Why)**, I identified that users need a lightweight, local-first encryption system that doesn't require a supercomputer to run.
-
-### **Introducing AADI-TECH-Vault (Project No. 05)**
-This isn’t just a locker; it’s a dedicated vault. Here is how it functions:
-
-* **The Logic:** Built on a "Zero-Trust" framework. You choose a file, set a strong master password, and the system converts it into a secure **.aadi** extension.
-* **True Privacy:** Once a file becomes a `.aadi` file, it is unreadable to any other application. Only the Vault can unlock its original state.
-* **No Hardware Barriers:** I developed this project on a basic, low-end PC. I optimized the code so that you don't need a high-end machine to secure your data. Efficiency is at the core of my engineering.
-
-### **How it Works (The Real Process)**
-1.  **File Selection:** Select any document, image, or config file.
-2.  **Encryption Engine:** The system processes the file using custom logic (backend-heavy cryptographic processing).
-3.  **The Lock:** Your file is renamed and encrypted with the unique `.aadi` extension.
-4.  **Decryption:** Enter the unique master key to revert the file to its original extension and content.
-
-### **A Message to the Global Tech Community & AI Researchers**
-My journey from Project 1 to this 5th major milestone has been fueled by one goal: **Becoming a world-class Software Engineer.** I don’t have access to the latest hardware or a high-end PC, but I have my logic and my paper sketches. 
-
-I am building **Aadi-Tech Systems** to show that great software comes from great problem-solving, not just great resources. I am looking for mentors, supporters, and fellow engineers who can help me scale my vision and reach a platform where my hardware doesn't limit my potential.
+**Aadi-Tech Vault** ek high-security encryption tool hai jo aapke files, images, aur `.exe` files ko 100% offline environment mein protect karta hai. Yeh tool **Localhost** par chalta hai, yani aapka data kabhi internet par nahi jata.
 
 ---
-**Keywords for Indexing:** Aditya Rai, Aadi-Tech Systems, AADI-TECH-Vault, .aadi file extension, Software Engineering, NF-1 Language, 4WS Canvas, Low-end PC Development, File Encryption Project.
-by Aditya Rai
+
+## 🛠️ User Manual: Kaise Chalu Karein?
+
+Isse use karna bahut simple hai, bas ye steps follow karein:
+
+### 1. Initial Setup (First Time Only)
+* Jab aap pehli baar tool kholenge, aapko ek **Master Key (Password)** create karni hogi.
+* Ye password **SHA-256** hashing ke saath aapke PC mein save ho jayega.
+* Verification ke liye aapko wahi password dubara dalna hoga, jisse aapki unique identity file generate ho sake.
+
+### 2. Encryption (File Lock Kaise Karein?)
+* **Choose File:** Apne browser dashboard par 'Choose File' par click karein.
+* **Select:** Kisi bhi file, image ya executable (.exe) ko select karein.
+* **Encrypt as Lock:** 'Encrypt' button dabayein. 
+* **Result:** Aapki file turant `.aadi` format mein badal jayegi (e.g., `photo.jpg.aadi`). Isse kholne par sirf kachra (garbage data) dikhega.
+
+### 3. Decryption (File Unlock Kaise Karein?)
+* Aapke dashboard par encrypt kari hui file ke aage **'Decrypt'** ka option dikhega.
+* Us par click karte hi file wapas apne purane format mein aa jayegi.
+
+### 4. Storage
+* System apne aap ek folder banayega: `Aadi Tech Vault`. 
+* Aapki saari locked (Encrypted) aur unlocked (Decrypted) files isi folder mein milengi.
+
+---
+
+## 🧠 Technical Details & Security
+* **Algorithm:** AES-256 bit encryption (Duniya ka sabse tagda standard).
+* **Master Key:** SHA-256 hash logic se secured.
+* **Zero Cloud:** Koi server nahi, koi login nahi. Sirf aapka PC aur aapka code.
+* **OS Integrity:** Windows/Linux ki security policies ko dhyan mein rakh kar banaya gaya hai.
+
+---
+
+## ⚠️ Important Disclaimer (Must Read)
+
+1. **Master Key Responsibility:** Agar aap apni Master Key bhool gaye, toh aapka data **hamesha ke liye lock** ho jayega. Humne koi back-door nahi banaya hai (Privacy ke liye), isliye recovery namumkin hai.
+2. **Backup:** Kisi bhi file ko lock karne se pehle uska original backup rakhna user ki apni zimmedari hai.
+3. **Sharing:** Agar aap apna password kisi ko batate hain, toh usse hone wale kisi bhi nuksan ke liye **Aadi-Tech** ya **Aditya Rai** zimmedar nahi honge.
+4. **No Warranty:** Apache License 2.0 ke tahat, ye software "AS IS" diya gaya hai. Iska upyog aap apni samajhdaari se karein.
+
+---
+
+## 👤 About the Author
+**Aditya Rai** *Founder, Aadi-Tech* Building lightweight and secure tools for the future.
+
+[Product Hunt](https://www.producthunt.com/@adityarai) | [Dev.to](https://dev.to/adityarai)
