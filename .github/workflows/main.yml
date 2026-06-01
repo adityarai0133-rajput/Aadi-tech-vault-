@@ -3,8 +3,8 @@ name: Build Aadi Tech Vault EXE
 on:
   push:
     tags:
-      - 'v*' # Jab tu v1.0.0 jaisa naya tag push karega tab ye chalega
-  workflow_dispatch: # Manual control ke liye 'Run workflow' ka option
+      - 'v*' # Tags par bhi chalega
+  workflow_dispatch: # Isse tu GitHub par manually click karke bhi EXE bana sakta hai
 
 jobs:
   build:
@@ -34,9 +34,10 @@ jobs:
 
     - name: Create GitHub Release and Upload Asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
       with:
         files: dist/Aadi_Tech_Vault_v1.zip
+        tag_name: "v1.0.0-build"  # 🔥 Yeh line bina tag ke bhi automatic release bana degi!
+        make_latest: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
