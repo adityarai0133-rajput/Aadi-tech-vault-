@@ -2,9 +2,9 @@ name: Build Aadi Tech Vault EXE
 
 on:
   push:
-    tags:
-      - 'v*' # Tags par bhi chalega
-  workflow_dispatch: # Isse tu GitHub par manually click karke bhi EXE bana sakta hai
+    branches:
+      - main # Jab bhi main branch par push hoga chalega
+  workflow_dispatch: # Isse tu manually click karke bina kisi error ke chalu kar sakta hai
 
 jobs:
   build:
@@ -32,12 +32,9 @@ jobs:
       run: |
         powershell Compress-Archive -Path dist/Aadi_Tech_Vault -DestinationPath dist/Aadi_Tech_Vault_v1.zip
 
-    - name: Create GitHub Release and Upload Asset
-      uses: softprops/action-gh-release@v2
+    - name: Upload EXE Artifact Without Version Errors
+      uses: actions/upload-artifact@v4
       with:
-        files: dist/Aadi_Tech_Vault_v1.zip
-        tag_name: "v1.0.0-build"  # 🔥 Yeh line bina tag ke bhi automatic release bana degi!
-        make_latest: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: Aadi_Tech_Vault_Windows_EXE
+        path: dist/Aadi_Tech_Vault_v1.zip
         
