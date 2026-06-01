@@ -26,7 +26,7 @@ jobs:
 
     - name: Compile App with PyInstaller
       run: |
-        pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --name "Aadi_Tech_Vault" main.py
+        pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --name "Aadi_Tech_Vault" app.py
 
     - name: Zip the Output Directory
       run: |
