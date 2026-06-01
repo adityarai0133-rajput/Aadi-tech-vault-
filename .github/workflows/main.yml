@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11' # Ekdam stable version windows ke liye (Fixed syntax here)
+        python-version: '3.11' # Ekdam stable version windows ke liye
 
     - name: Install Dependencies
       run: |
@@ -27,6 +27,8 @@ jobs:
     - name: Compile App with PyInstaller
       run: |
         pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --name "Aadi_Tech_Vault" app.py
+      # 🔥 ALERT: Agar teri file ka naam repository mein 'main.py' hai toh upar 'app.py' ki jagah 'main.py' kar dena.
+      # Agar naam 'app.py' hai, toh ye bina kisi error ke 100% chal jayega!
 
     - name: Zip the Output Directory
       run: |
@@ -34,7 +36,7 @@ jobs:
 
     - name: Create GitHub Release and Upload Asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/') # Yeh tabhi chalega jab actual tag push hoga, workflow_dispatch par error nahi dega
+      if: startsWith(github.ref, 'refs/tags/') # Tag push hone par hi release banayega
       with:
         files: dist/Aadi_Tech_Vault_v1.zip
       env:
