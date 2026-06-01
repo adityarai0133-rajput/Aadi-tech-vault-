@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AADI_VAULT | NEURAL LINK</title>
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-pink: #ff00ff;
+            --bg-dark: #050608;
+            --card-bg: rgba(13, 17, 23, 0.9);
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050608 100%),
+                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 420px;
+            padding: 40px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.1), inset 0 0 15px rgba(0, 242, 254, 0.05);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), transparent, var(--neon-pink));
+            z-index: -1;
+            border-radius: 22px;
+            opacity: 0.4;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, var(--neon-blue), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
+        .sub-tag {
+            font-size: 10px;
+            color: var(--neon-blue);
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-list {
+            margin-top: 30px;
+            text-align: left;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .file-item span {
+            color: #a0aec0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        .decrypt-btn {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid var(--neon-blue);
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .decrypt-btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+        }
+
+        .error-msg {
+            color: #ff4b5c;
+            font-size: 12px;
+            background: rgba(255, 75, 92, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 75, 92, 0.2);
+        }
+
+        .logout {
+            margin-top: 25px;
+            display: inline-block;
+            color: #4a5568;
+            font-size: 11px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .logout:hover { color: var(--neon-pink); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">AADI_VAULT</div>
+    <div class="sub-tag">CYBERNETIC ENCRYPTION v2.0</div>
+
+    {% if mode == "setup" %}
+        <p style="font-size: 13px; color: #718096;">[ SYSTEM INITIALIZATION REQUIRED ]</p>
+        <form action="/gatekeeper" method="POST" onsubmit="handleLoading(this)">
+            <input type="password" name="master_key_field" placeholder="CREATE MASTER ACCESS KEY" required>
+            <button type="submit" class="btn">INITIALIZE CORE</button>
+        </form>
+
+    {% elif mode == "login" %}
+        {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+        <form action="/gatekeeper" method="POST" onsubmit="handleLoading(this)">
+            <input type="password" name="master_key_field" placeholder="ENTER ACCESS KEY" required>
+            <button type="submit" class="btn">AUTHORIZE ACCESS</button>
+        </form>
+
+    {% else %}
+        <p style="font-size: 11px; color: var(--neon-blue); text-align: left; margin-bottom: 5px;">> UPLOAD PROTOCOL:</p>
+        <form action="/encrypt" method="POST" enctype="multipart/form-data" onsubmit="handleLoading(this)">
+            <input type="file" name="file" required>
+            <button type="submit" class="btn">ENCRYPT & SECURE</button>
+        </form>
+
+        <div class="file-list">
+            <p style="font-size: 11px; color: #4a5568; margin-bottom: 10px;">[ SECURE DATA NODES ]</p>
+            {% for f in files %}
+            <div class="file-item">
+                <span>{{ f }}</span>
+                <a href="/decrypt/{{ f }}" class="decrypt-btn">DECRYPT</a>
+            </div>
+            {% endfor %}
+            {% if not files %}
+                <p style="font-size: 12px; color: #4a5568; text-align: center;">VAULT EMPTY</p>
+            {% endif %}
+        </div>
+
+        <a href="/logout" class="logout">TERMINATE_SESSION_</a>
+    {% endif %}
+</div>
+
+<script>
+    function handleLoading(form) {
+        const btn = form.querySelector('.btn');
+        btn.disabled = true;
+        btn.innerText = "PROCESSING...";
+        btn.style.boxShadow = "0 0 20px var(--neon-pink)";
+        btn.style.borderColor = "var(--neon-pink)";
+        btn.style.color = "var(--neon-pink)";
+    }
+</script>
+
+</body>
+</html>
