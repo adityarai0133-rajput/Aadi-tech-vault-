@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -59,7 +60,7 @@ jobs:
       - name: Install Android Build Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install buildozer cython kivy pycryptodome
 
@@ -70,8 +71,9 @@ jobs:
             sed -i 's/^title =.*/title = Aadi Tech Vault/' buildozer.spec
             sed -i 's/^package.name =.*/package.name = aaditechvault/' buildozer.spec
             sed -i 's/^package.domain =.*/package.domain = org.kyxgo/' buildozer.spec
-            sed -i 's/^requirements =.*/requirements = python3,kivy,pycryptodome/' buildozer.spec
+            sed -i 's/^requirements =.*/requirements = python3,kivy,pycryptodome,flask/' buildozer.spec
             sed -i 's/^orientation =.*/orientation = portrait/' buildozer.spec
+            sed -i 's/# android.permissions =.*/android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE/' buildozer.spec
           fi
 
       - name: Build Android APK with Buildozer
