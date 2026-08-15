@@ -1,4 +1,4 @@
-name: Build and Upload AadiVault EXE
+name: Build and Push EXE to Repo
 
 on:
   push:
@@ -31,16 +31,11 @@ jobs:
         run: |
           pyinstaller --noconfirm --onefile --windowed --add-data "templates;templates" --name "AadiVault" app.py
 
-      - name: Auto-Detect Release & Upload EXE
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Move EXE and Commit Directly to Repo
         run: |
-          $latestRelease = gh release list --limit 1 --json tagName --jq ".[0].tagName"
-          if (-not $latestRelease) {
-              Write-Host "No release found, creating v1.0.0..."
-              gh release create v1.0.0 dist\AadiVault.exe --title "Aadi Vault v1.0.0" --notes "Official Aadi Vault Release"
-          } else {
-              Write-Host "Found existing release tag: $latestRelease. Uploading AadiVault.exe..."
-              gh release upload $latestRelease dist\AadiVault.exe --clobber
-          }
+          copy dist\AadiVault.exe AadiVault.exe
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add AadiVault.exe
+          git commit -m "Auto-commit compiled AadiVault.exe" || exit 0
+          git push
