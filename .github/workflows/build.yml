@@ -1,4 +1,4 @@
-name: Build and Push EXE to Repo
+name: Build AadiVault Windows Installer
 
 on:
   push:
@@ -27,15 +27,50 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller cryptography flask
 
-      - name: Build Windows Executable
+      - name: Build Executable
         run: |
-          pyinstaller --noconfirm --onefile --windowed --add-data "templates;templates" --name "AadiVault" app.py
+          pyinstaller --noconfirm --onefile --windowed --add-data "templates;templates" --name "AadiVaultApp" app.py
 
-      - name: Move EXE and Commit Directly to Repo
+      - name: Install Inno Setup
         run: |
-          copy dist\AadiVault.exe AadiVault.exe
+          choco install innosetup --no-progress
+
+      - name: Generate Inno Setup Script
+        shell: pwsh
+        run: |
+          $iss = @"
+          [Setup]
+          AppName=Aadi Vault
+          AppVersion=1.0.0
+          AppPublisher=Aditya
+          DefaultDirName={autopf}\Aadi Vault
+          DefaultGroupName=Aadi Vault
+          UninstallDisplayIcon={app}\AadiVaultApp.exe
+          OutputBaseFilename=AadiVault
+          OutputDir=.
+          Compression=lzma
+          SolidCompression=yes
+          ArchitecturesInstallIn64BitMode=x64
+          DisableDirPage=auto
+          DisableProgramGroupPage=auto
+
+          [Files]
+          Source: "dist\AadiVaultApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+          [Icons]
+          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
+          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
+          "@
+          Set-Content -Path installer.iss -Value $iss
+
+      - name: Build Installer Package
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      - name: Commit New Installer
+        run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add AadiVault.exe
-          git commit -m "Auto-commit compiled AadiVault.exe" || exit 0
+          git commit -m "Auto-build verified Windows Installer" || exit 0
           git push
