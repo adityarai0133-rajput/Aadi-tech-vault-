@@ -1,4 +1,4 @@
-name: Build and Release AadiVault EXE
+name: Build and Upload AadiVault EXE
 
 on:
   workflow_dispatch:
@@ -23,20 +23,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller cryptography flask
 
-      - name: Build Windows Executable
-        shell: pwsh
+      - name: Build Standalone EXE
         run: |
-          pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --name "AadiVault" app.py
-          Compress-Archive -Path dist/AadiVault/* -DestinationPath dist/AadiVault.zip
+          pyinstaller --noconfirm --onefile --windowed --add-data "templates;templates" --name "AadiVault" app.py
 
-      - name: Create or Update Release
+      - name: Upload EXE to Existing Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          name: "Aadi Vault v1.0.0"
-          draft: false
-          prerelease: false
-          files: |
-            dist/AadiVault/AadiVault.exe
+          files: dist/AadiVault.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
