@@ -1,91 +1,49 @@
-name: Build Aadi Tech Vault EXE and APK
+name: Build and Release AadiVault EXE
 
 on:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
-  # ==========================================
-  # 1. WINDOWS EXE BUILD JOB
-  # ==========================================
-  build-windows-exe:
+  build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install Build Tools
         run: |
           python -m pip install --upgrade pip
-          pip install flask pycryptodome pyinstaller kivy
+          pip install pyinstaller cryptography
 
-      - name: Compile App with PyInstaller
+      - name: Build Windows Executable
+        shell: pwsh
         run: |
-          pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --name "Aadi_Tech_Vault" app.py
+          $entryFile = Get-ChildItem -Filter *.py | Select-Object -First 1 -ExpandProperty Name
+          if (-not $entryFile) {
+              Write-Error "No python script found in repo root!"
+              exit 1
+          }
+          Write-Host "Found entry file: $entryFile"
+          pyinstaller --onefile --noconsole --name "AadiVault" $entryFile
 
-      - name: Zip the Output Directory
-        run: |
-          powershell Compress-Archive -Path dist/Aadi_Tech_Vault -DestinationPath dist/Aadi_Tech_Vault_v1.zip
-
-      - name: Upload Windows EXE Artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release and Upload EXE
+        uses: softprops/action-gh-release@v2
         with:
-          name: Aadi_Tech_Vault_Windows_EXE
-          path: dist/Aadi_Tech_Vault_v1.zip
-
-  # ==========================================
-  # 2. ANDROID APK BUILD JOB (KIVY + BUILDOZER)
-  # ==========================================
-  build-android-apk:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Android & Libtool Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip python3-setuptools autoconf libtool libtool-bin m4 gettext autopoint pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
-          pip install --upgrade pip
-          pip install "buildozer==1.5.0" "cython<3.0.0" kivy pycryptodome
-
-      - name: Auto-Create or Update Buildozer Spec File
-        run: |
-          if [ ! -f buildozer.spec ]; then
-            buildozer init
-            sed -i 's/^title =.*/title = Aadi Tech Vault/' buildozer.spec
-            sed -i 's/^package.name =.*/package.name = aaditechvault/' buildozer.spec
-            sed -i 's/^package.domain =.*/package.domain = org.kyxgo/' buildozer.spec
-            sed -i 's/^requirements =.*/requirements = python3,kivy,pycryptodome,flask/' buildozer.spec
-            sed -i 's/^orientation =.*/orientation = portrait/' buildozer.spec
-            sed -i 's/# android.permissions =.*/android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE/' buildozer.spec
-            sed -i 's/# android.api =.*/android.api = 33/' buildozer.spec
-            sed -i 's/# android.minapi =.*/android.minapi = 21/' buildozer.spec
-            sed -i 's/# p4a.branch =.*/p4a.branch = master/' buildozer.spec
-          fi
-
-      - name: Build Android APK with Buildozer
-        run: |
-          yes | buildozer android debug
-
-      - name: Upload Android APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Aadi_Tech_Vault_Android_APK
-          path: bin/*.apk
-          retention-days: 7
+          tag_name: v1.0.0
+          name: "Aadi Vault v1.0.0 Release"
+          draft: false
+          prerelease: false
+          files: dist/AadiVault.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
