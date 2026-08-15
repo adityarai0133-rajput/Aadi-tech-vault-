@@ -3,17 +3,14 @@ name: Build and Upload AadiVault EXE
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -23,14 +20,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller cryptography flask
 
-      - name: Build Standalone EXE
+      - name: Compile to EXE
         run: |
           pyinstaller --noconfirm --onefile --windowed --add-data "templates;templates" --name "AadiVault" app.py
 
-      - name: Upload EXE to Existing Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.0
-          files: dist/AadiVault.exe
+      - name: Upload to Release v1.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload v1.0.0 dist\AadiVault.exe --clobber
+          
