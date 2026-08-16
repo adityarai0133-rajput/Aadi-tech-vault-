@@ -1,4 +1,4 @@
-name: Build and Deploy AadiVault Installer
+name: Build and Deploy AadiTechVault Installer
 
 on:
   push:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -27,31 +27,48 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install All Python Dependencies & Kivy Backends
         run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller pycryptodome cryptography flask
+          python -m pip install --upgrade pip setuptools wheel
+          pip install pycryptodome flask "kivy[base]" kivy_deps.sdl2 kivy_deps.glew pyinstaller
 
-      - name: Build Executable
+      - name: Build Standalone Windows Executable
+        shell: pwsh
         run: |
-          pyinstaller --noconfirm --onefile --windowed `
-            --collect-all Crypto `
-            --hidden-import=Crypto `
-            --hidden-import=Crypto.Cipher `
-            --hidden-import=Crypto.Cipher.AES `
-            --hidden-import=Crypto.Random `
-            --name "AadiVaultApp" `
-            app.py
+          $addTemplateArg = ""
+          if (Test-Path "templates") {
+              $addTemplateArg = '--add-data "templates;templates"'
+          }
+
+          $cmd = "pyinstaller --noconfirm --onefile --windowed " +
+                 "--collect-all kivy " +
+                 "--collect-all Crypto " +
+                 "--collect-all flask " +
+                 "--collect-all jinja2 " +
+                 "--collect-all werkzeug " +
+                 "$addTemplateArg " +
+                 "--hidden-import=Crypto " +
+                 "--hidden-import=Crypto.Cipher " +
+                 "--hidden-import=Crypto.Cipher.AES " +
+                 "--hidden-import=Crypto.Random " +
+                 "--hidden-import=Crypto.Util.Padding " +
+                 "--hidden-import=kivy " +
+                 "--hidden-import=kivy.core.window " +
+                 "--hidden-import=kivy.core.text " +
+                 "--hidden-import=kivy.core.image " +
+                 "--name app app.py"
+
+          Invoke-Expression $cmd
 
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
 
-      - name: Generate Inno Setup Script
+      - name: Generate Microsoft Store Compliant Inno Script
         shell: pwsh
         run: |
           $iss = @"
@@ -61,7 +78,7 @@ jobs:
           AppPublisher=Aditya Rai
           DefaultDirName={autopf}\Aadi Vault
           DefaultGroupName=Aadi Vault
-          UninstallDisplayIcon={app}\AadiVaultApp.exe
+          UninstallDisplayIcon={app}\app.exe
           OutputBaseFilename=AadiVault
           OutputDir=public
           Compression=lzma2/ultra64
@@ -73,22 +90,22 @@ jobs:
           DisableProgramGroupPage=auto
 
           [Files]
-          Source: "dist\AadiVaultApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+          Source: "dist\app.exe"; DestDir: "{app}"; Flags: ignoreversion
 
           [Icons]
-          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
-          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
+          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\app.exe"
+          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\app.exe"
 
           [Run]
-          Filename: "{app}\AadiVaultApp.exe"; Description: "Launch Aadi Vault"; Flags: nowait postinstall skipifsilent
+          Filename: "{app}\app.exe"; Description: "Launch Aadi Vault"; Flags: nowait postinstall skipifsilent
           "@
           Set-Content -Path installer.iss -Value $iss
 
-      - name: Build Installer Package
+      - name: Compile Inno Setup Installer
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
-      - name: Create Index HTML Page
+      - name: Create Index HTML for Auto-Download
         shell: pwsh
         run: |
           $html = @"
