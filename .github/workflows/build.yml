@@ -37,75 +37,39 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install pycryptodome flask "kivy[base]" kivy_deps.sdl2 kivy_deps.glew pyinstaller
 
-      - name: Generate Spec and Build EXE
+      - name: Build Windows Executable
+        shell: pwsh
         run: |
-          python -c "
-          import os
-          spec = '''# -*- mode: python ; coding: utf-8 -*-
-          import os
-          from PyInstaller.utils.hooks import collect_all
-          from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, get_factory_import_paths, hookspath
+          $addTemplateArg = ""
+          if (Test-Path "templates") {
+              $addTemplateArg = '--add-data "templates;templates"'
+          }
 
-          block_cipher = None
+          $cmd = "pyinstaller --noconfirm --onefile --windowed " +
+                 "--collect-all Crypto " +
+                 "--collect-all flask " +
+                 "--collect-all jinja2 " +
+                 "--collect-all werkzeug " +
+                 "--collect-submodules kivy.core " +
+                 "--collect-submodules kivy.uix " +
+                 "--collect-data kivy " +
+                 "--exclude-module kivy.garden " +
+                 "--exclude-module tkinter " +
+                 "--exclude-module unittest " +
+                 "$addTemplateArg " +
+                 "--hidden-import=Crypto " +
+                 "--hidden-import=Crypto.Cipher.AES " +
+                 "--hidden-import=Crypto.Random " +
+                 "--hidden-import=Crypto.Util.Padding " +
+                 "--hidden-import=kivy.core.window " +
+                 "--hidden-import=kivy.core.window.window_sdl2 " +
+                 "--hidden-import=kivy.core.text " +
+                 "--hidden-import=kivy.core.text.text_sdl2 " +
+                 "--hidden-import=kivy.core.image " +
+                 "--hidden-import=kivy.core.image.img_sdl2 " +
+                 "--name app app.py"
 
-          c_datas, c_bin, c_hid = collect_all('Crypto')
-          f_datas, f_bin, f_hid = collect_all('flask')
-          j_datas, j_bin, j_hid = collect_all('jinja2')
-          w_datas, w_bin, w_hid = collect_all('werkzeug')
-
-          kivy_deps = get_deps_minimal(video=None, audio=None)
-
-          all_datas = c_datas + f_datas + j_datas + w_datas + kivy_deps.get('datas', [])
-          if os.path.exists('templates'):
-              all_datas.append(('templates', 'templates'))
-
-          all_bin = c_bin + f_bin + j_bin + w_bin + kivy_deps.get('binaries', [])
-          all_hid = c_hid + f_hid + j_hid + w_hid + kivy_deps.get('hiddenimports', []) + get_factory_import_paths()
-
-          a = Analysis(
-              ['app.py'],
-              pathex=[],
-              binaries=all_bin,
-              datas=all_datas,
-              hiddenimports=all_hid,
-              hookspath=hookspath(),
-              hooksconfig={},
-              runtime_hooks=[],
-              excludes=['kivy.garden', 'tkinter', 'unittest'],
-              win_no_prefer_redirects=False,
-              win_private_assemblies=False,
-              cipher=block_cipher,
-              noarchive=False,
-          )
-
-          pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-          exe = EXE(
-              pyz,
-              a.scripts,
-              a.binaries,
-              a.zipfiles,
-              a.datas,
-              [],
-              name='app',
-              debug=False,
-              bootloader_ignore_signals=False,
-              strip=False,
-              upx=True,
-              upx_exclude=[],
-              runtime_tmpdir=None,
-              console=False,
-              disable_windowed_traceback=False,
-              argv_emulation=False,
-              target_arch=None,
-              codesign_identity=None,
-              entitlements_file=None,
-          )
-          '''
-          with open('app.spec', 'w') as f:
-              f.write(spec)
-          "
-          pyinstaller --noconfirm app.spec
+          Invoke-Expression $cmd
 
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
@@ -176,3 +140,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
