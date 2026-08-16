@@ -1,8 +1,10 @@
-name: Build and Deploy Windows Installer to GitHub Pages
+name: Build and Deploy AadiVault Installer
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 permissions:
@@ -15,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -25,77 +27,84 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
-      - name: Install Python Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pycryptodome pyinstaller
+          pip install pyinstaller pycryptodome cryptography flask
 
-      - name: Build Executable with PyInstaller (Full Crypto Modules)
+      - name: Build Executable
         run: |
-          pyinstaller --noconfirm --onedir --windowed `
+          pyinstaller --noconfirm --onefile --windowed `
             --collect-all Crypto `
             --hidden-import=Crypto `
             --hidden-import=Crypto.Cipher `
             --hidden-import=Crypto.Cipher.AES `
-            --hidden-import=Crypto.Cipher.PKCS1_OAEP `
-            --hidden-import=Crypto.PublicKey.RSA `
             --hidden-import=Crypto.Random `
-            --hidden-import=Crypto.Util.Padding `
-            --hidden-import=Crypto.Protocol.KDF `
-            --hidden-import=Crypto.Hash.SHA256 `
+            --name "AadiVaultApp" `
             app.py
 
       - name: Install Inno Setup
-        run: choco install innosetup -y
+        run: choco install innosetup --no-progress
 
-      - name: Generate Microsoft Store Compliant Inno Setup Script
+      - name: Generate Inno Setup Script
         shell: pwsh
         run: |
-          $issContent = @"
+          $iss = @"
           [Setup]
           AppName=Aadi Vault
           AppVersion=1.0.0
           AppPublisher=Aditya Rai
           DefaultDirName={autopf}\Aadi Vault
           DefaultGroupName=Aadi Vault
-          OutputDir=dist_installer
-          OutputBaseFilename=AadiVaultSetup
+          UninstallDisplayIcon={app}\AadiVaultApp.exe
+          OutputBaseFilename=AadiVault
+          OutputDir=public
           Compression=lzma2/ultra64
           SolidCompression=yes
           PrivilegesRequired=lowest
-          DisableProgramGroupPage=yes
           CloseApplications=force
           RestartIfNeededByRun=no
-          UninstallDisplayIcon={app}\app.exe
-
-          [Tasks]
-          Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+          DisableDirPage=auto
+          DisableProgramGroupPage=auto
 
           [Files]
-          Source: "dist\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+          Source: "dist\AadiVaultApp.exe"; DestDir: "{app}"; Flags: ignoreversion
 
           [Icons]
-          Name: "{group}\Aadi Vault"; Filename: "{app}\app.exe"
-          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\app.exe"; Tasks: desktopicon
+          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
+          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\AadiVaultApp.exe"
 
           [Run]
-          Filename: "{app}\app.exe"; Description: "{cm:LaunchProgram,Aadi Vault}"; Flags: nowait postinstall skipifsilent
+          Filename: "{app}\AadiVaultApp.exe"; Description: "Launch Aadi Vault"; Flags: nowait postinstall skipifsilent
           "@
-          Set-Content -Path "installer.iss" -Value $issContent
+          Set-Content -Path installer.iss -Value $iss
 
-      - name: Compile Installer to EXE
-        run: ISCC.exe installer.iss
+      - name: Build Installer Package
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
-      - name: Prepare GitHub Pages Payload
+      - name: Create Index HTML Page
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path public
-          Copy-Item -Path "dist_installer\AadiVaultSetup.exe" -Destination "public\AadiVaultSetup.exe"
+          $html = @"
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=AadiVault.exe" />
+            <title>Downloading Aadi Vault...</title>
+          </head>
+          <body>
+            <h2>Downloading Aadi Vault...</h2>
+            <p>If download doesn't start, <a href="AadiVault.exe">click here</a>.</p>
+          </body>
+          </html>
+          "@
+          Set-Content -Path "public\index.html" -Value $html
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
