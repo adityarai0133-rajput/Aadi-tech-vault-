@@ -37,36 +37,37 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install pycryptodome flask "kivy[base]" kivy_deps.sdl2 kivy_deps.glew pyinstaller
 
-      - name: Generate Spec & Build Windows App
-        shell: pwsh
+      - name: Generate Spec and Build EXE
         run: |
-          $specContent = @"
+          python -c "
+          import os
+          spec = '''# -*- mode: python ; coding: utf-8 -*-
+          import os
           from PyInstaller.utils.hooks import collect_all
           from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, get_factory_import_paths, hookspath
 
           block_cipher = None
 
-          crypto_datas, crypto_binaries, crypto_hiddenimports = collect_all('Crypto')
-          flask_datas, flask_binaries, flask_hiddenimports = collect_all('flask')
-          jinja_datas, jinja_binaries, jinja_hiddenimports = collect_all('jinja2')
-          werk_datas, werk_binaries, werk_hiddenimports = collect_all('werkzeug')
+          c_datas, c_bin, c_hid = collect_all('Crypto')
+          f_datas, f_bin, f_hid = collect_all('flask')
+          j_datas, j_bin, j_hid = collect_all('jinja2')
+          w_datas, w_bin, w_hid = collect_all('werkzeug')
 
           kivy_deps = get_deps_minimal(video=None, audio=None)
 
-          all_datas = crypto_datas + flask_datas + jinja_datas + werk_datas + kivy_deps.get('datas', [])
-          if (Test-Path "templates") {
+          all_datas = c_datas + f_datas + j_datas + w_datas + kivy_deps.get('datas', [])
+          if os.path.exists('templates'):
               all_datas.append(('templates', 'templates'))
-          }
 
-          all_binaries = crypto_binaries + flask_binaries + jinja_binaries + werk_binaries + kivy_deps.get('binaries', [])
-          all_hidden = crypto_hiddenimports + flask_hiddenimports + jinja_hiddenimports + werk_hiddenimports + kivy_deps.get('hiddenimports', []) + get_factory_import_paths()
+          all_bin = c_bin + f_bin + j_bin + w_bin + kivy_deps.get('binaries', [])
+          all_hid = c_hid + f_hid + j_hid + w_hid + kivy_deps.get('hiddenimports', []) + get_factory_import_paths()
 
           a = Analysis(
               ['app.py'],
               pathex=[],
-              binaries=all_binaries,
+              binaries=all_bin,
               datas=all_datas,
-              hiddenimports=all_hidden,
+              hiddenimports=all_hid,
               hookspath=hookspath(),
               hooksconfig={},
               runtime_hooks=[],
@@ -100,8 +101,10 @@ jobs:
               codesign_identity=None,
               entitlements_file=None,
           )
-          "@
-          Set-Content -Path "app.spec" -Value $specContent
+          '''
+          with open('app.spec', 'w') as f:
+              f.write(spec)
+          "
           pyinstaller --noconfirm app.spec
 
       - name: Install Inno Setup
