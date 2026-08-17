@@ -34,8 +34,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          pip install pycryptodome flask "kivy[base]" kivy_deps.sdl2 kivy_deps.glew pyinstaller
+          python -m pip install --upgrade pip
+          pip install pyinstaller pycryptodome flask
 
       - name: Build Windows Executable
         shell: pwsh
@@ -48,25 +48,11 @@ jobs:
           $cmd = "pyinstaller --noconfirm --onefile --windowed " +
                  "--collect-all Crypto " +
                  "--collect-all flask " +
-                 "--collect-all jinja2 " +
-                 "--collect-all werkzeug " +
-                 "--collect-submodules kivy.core " +
-                 "--collect-submodules kivy.uix " +
-                 "--collect-data kivy " +
-                 "--exclude-module kivy.garden " +
-                 "--exclude-module tkinter " +
-                 "--exclude-module unittest " +
-                 "$addTemplateArg " +
                  "--hidden-import=Crypto " +
                  "--hidden-import=Crypto.Cipher.AES " +
                  "--hidden-import=Crypto.Random " +
                  "--hidden-import=Crypto.Util.Padding " +
-                 "--hidden-import=kivy.core.window " +
-                 "--hidden-import=kivy.core.window.window_sdl2 " +
-                 "--hidden-import=kivy.core.text " +
-                 "--hidden-import=kivy.core.text.text_sdl2 " +
-                 "--hidden-import=kivy.core.image " +
-                 "--hidden-import=kivy.core.image.img_sdl2 " +
+                 "$addTemplateArg " +
                  "--name app app.py"
 
           Invoke-Expression $cmd
@@ -140,4 +126,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
