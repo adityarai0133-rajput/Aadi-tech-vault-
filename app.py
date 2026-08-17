@@ -1,14 +1,7 @@
-import os, hashlib, sys, webbrowser, threading
+import os, hashlib, sys, webbrowser, threading, time
 from flask import Flask, render_template, request, redirect, session, send_from_directory
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-
-# Kivy Framework Imports for EXE & APK
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.core.window import Window
 
 def resource_path(relative_path):
     try: 
@@ -20,17 +13,7 @@ def resource_path(relative_path):
 app = Flask(__name__, template_folder=resource_path('templates'))
 app.secret_key = os.urandom(32)
 
-# Mobile vs Desktop Storage Path Resolver
-if 'ANDROID_ARGUMENT' in os.environ:
-    # Android External Public Storage Path
-    from android.permissions import request_permissions, Permission
-    request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-    from android.storage import primary_external_storage_path
-    VAULT_DIR = os.path.join(primary_external_storage_path(), "Aadi_Vault")
-else:
-    # Desktop Standard Path
-    VAULT_DIR = "Aadi_Vault"
-
+VAULT_DIR = "Aadi_Vault"
 PWD_FILE = os.path.join(VAULT_DIR, "shadow.txt")
 KEY_FILE = os.path.join(VAULT_DIR, "master.key")
 
@@ -47,7 +30,6 @@ def get_aes_key():
         return f.read()
 
 def clean_vault():
-    """Temporary UNLOCKED files ko delete karne ke liye taaki speed bani rahe"""
     if os.path.exists(VAULT_DIR):
         for f in os.listdir(VAULT_DIR):
             if f.startswith("UNLOCKED_"):
@@ -135,36 +117,10 @@ def logout():
     session.clear()
     return redirect('/')
 
-def start_flask_server():
-    app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
-
-# Kivy Application UI Container
-class AadiTechVaultApp(App):
-    def build(self):
-        self.title = "Aadi Tech Vault"
-        
-        # Start Flask Backend Engine in Background Thread
-        threading.Thread(target=start_flask_server, daemon=True).start()
-
-        layout = BoxLayout(orientation='vertical', padding=20, spacing=15)
-        
-        status_label = Label(
-            text="[b]Aadi Tech Vault Core Engine Active[/b]\n\nServer running locally at:\nhttp://127.0.0.1:5000",
-            markup=True,
-            halign="center"
-        )
-        
-        open_btn = Button(
-            text="Open Vault Interface",
-            size_hint=(1, 0.2),
-            background_color=(0.1, 0.6, 0.9, 1)
-        )
-        open_btn.bind(on_press=lambda instance: webbrowser.open('http://127.0.0.1:5000/'))
-
-        layout.add_widget(status_label)
-        layout.add_widget(open_btn)
-        
-        return layout
+def open_browser():
+    time.sleep(1.5)
+    webbrowser.open('http://127.0.0.1:5000')
 
 if __name__ == '__main__':
-    AadiTechVaultApp().run()
+    threading.Thread(target=open_browser, daemon=True).start()
+    app.run(host='127.0.0.1', port=5000, debug=False)
