@@ -45,7 +45,13 @@ jobs:
               $addTemplateArg = '--add-data "templates;templates"'
           }
 
+          $iconArg = ""
+          if (Test-Path "icon.ico") {
+              $iconArg = '--icon="icon.ico"'
+          }
+
           $cmd = "pyinstaller --noconfirm --onefile --windowed " +
+                 "$iconArg " +
                  "--collect-all Crypto " +
                  "--collect-all flask " +
                  "--collect-all webview " +
@@ -73,6 +79,7 @@ jobs:
           DefaultDirName={autopf}\Aadi Vault
           DefaultGroupName=Aadi Vault
           UninstallDisplayIcon={app}\app.exe
+          SetupIconFile=icon.ico
           OutputBaseFilename=AadiVault
           OutputDir=public
           Compression=lzma2/ultra64
@@ -85,10 +92,11 @@ jobs:
 
           [Files]
           Source: "dist\app.exe"; DestDir: "{app}"; Flags: ignoreversion
+          Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
           [Icons]
-          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\app.exe"
-          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\app.exe"
+          Name: "{autoprograms}\Aadi Vault"; Filename: "{app}\app.exe"; IconFilename: "{app}\icon.ico"
+          Name: "{autodesktop}\Aadi Vault"; Filename: "{app}\app.exe"; IconFilename: "{app}\icon.ico"
 
           [Run]
           Filename: "{app}\app.exe"; Description: "Launch Aadi Vault"; Flags: nowait postinstall skipifsilent
