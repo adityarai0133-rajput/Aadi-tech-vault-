@@ -19,9 +19,9 @@ def resource_path(relative_path):
 app = Flask(__name__, template_folder=resource_path('templates'))
 app.secret_key = os.urandom(32)
 
-# Auto-created Dedicated System Vault Directory
-USER_DOCS = os.path.join(os.path.expanduser('~'), 'Documents')
-VAULT_DIR = os.path.join(USER_DOCS, "Aadi_Vault")
+# Persistent Documents Storage Path
+DOCUMENTS_DIR = os.path.join(os.path.expanduser('~'), 'Documents')
+VAULT_DIR = os.path.join(DOCUMENTS_DIR, "Aadi_Vault_Storage")
 os.makedirs(VAULT_DIR, exist_ok=True)
 
 PWD_FILE = os.path.join(VAULT_DIR, "shadow.dat")
@@ -43,7 +43,6 @@ def index():
     if 'auth' not in session: 
         return render_template('index.html', mode="login")
     
-    # List all encrypted .aadi files from system vault
     files = [f for f in os.listdir(VAULT_DIR) if f.endswith('.aadi')]
     return render_template('index.html', mode="dashboard", files=files)
 
@@ -68,7 +67,7 @@ def gatekeeper():
             session.permanent = True
             return redirect('/')
             
-    return render_template('index.html', mode="login", error="INVALID MASTER KEY!")
+    return render_template('index.html', mode="login", error="INVALID ACCESS KEY!")
 
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
@@ -77,8 +76,8 @@ def encrypt_file():
         
     uploaded_file = request.files.get('file')
     if uploaded_file and uploaded_file.filename:
-        raw_name = os.path.basename(uploaded_file.filename)
-        clean_name = raw_name.replace(".aadi", "")
+        filename = os.path.basename(uploaded_file.filename)
+        clean_name = filename.replace(".aadi", "")
         
         file_bytes = uploaded_file.read()
         if len(file_bytes) == 0:
@@ -88,9 +87,7 @@ def encrypt_file():
         cipher = AES.new(key, AES.MODE_CBC)
         encrypted_bytes = cipher.encrypt(pad(file_bytes, AES.block_size))
         
-        # Save directly in System Vault folder
-        encrypted_filename = clean_name + ".aadi"
-        target_path = os.path.join(VAULT_DIR, encrypted_filename)
+        target_path = os.path.join(VAULT_DIR, clean_name + ".aadi")
         with open(target_path, "wb") as f:
             f.write(cipher.iv + encrypted_bytes)
             
@@ -113,30 +110,63 @@ def decrypt_file(filename):
             file_data = f.read()
             
         if len(file_data) <= 16:
-            return "<h3 style='color:red;'>File Error</h3>", 400
+            return render_template('index.html', mode="dashboard", files=[f for f in os.listdir(VAULT_DIR) if f.endswith('.aadi')], error="CORRUPTED NODE FILE!")
             
         iv = file_data[:16]
         encrypted_payload = file_data[16:]
         
         cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-        decrypted_bytes = unpad(cipher.decrypt(encrypted_payload), AES.block_size)
+        decrypted_original = unpad(cipher.decrypt(encrypted_payload), AES.block_size)
         
         original_filename = safe_filename.replace(".aadi", "")
         
-        # Save the restored decrypted original file directly in the Vault folder
+        # Save restored file to system vault folder
         restored_path = os.path.join(VAULT_DIR, original_filename)
         with open(restored_path, "wb") as f:
-            f.write(decrypted_bytes)
+            f.write(decrypted_original)
         
-        # Also send download trigger to user
+        # Trigger direct download
         return send_file(
-            io.BytesIO(decrypted_bytes),
+            io.BytesIO(decrypted_original),
             as_attachment=True,
             download_name=original_filename,
             mimetype='application/octet-stream'
         )
     except Exception:
-        return "<h3 style='color:red;'>Decryption Error! Key Mismatch.</h3>", 400
+        return render_template('index.html', mode="dashboard", files=[f for f in os.listdir(VAULT_DIR) if f.endswith('.aadi')], error="DECRYPTION FAILED: KEY MISMATCH!")
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    if 'auth' not in session:
+        return redirect('/')
+        
+    old_p = request.form.get("old_password", "").strip()
+    new_p = request.form.get("new_password", "").strip()
+    cnf_p = request.form.get("confirm_password", "").strip()
+    files = [f for f in os.listdir(VAULT_DIR) if f.endswith('.aadi')]
+    
+    if not old_p or not new_p or not cnf_p:
+        return render_template('index.html', mode="dashboard", files=files, error="ALL FIELDS REQUIRED!")
+        
+    if new_p != cnf_p:
+        return render_template('index.html', mode="dashboard", files=files, error="NEW PASSWORDS DO NOT MATCH!")
+        
+    if len(new_p) < 4:
+        return render_template('index.html', mode="dashboard", files=files, error="KEY MUST BE AT LEAST 4 CHARACTERS!")
+
+    if not os.path.exists(PWD_FILE):
+        return render_template('index.html', mode="dashboard", files=files, error="SHADOW STORAGE MISSING!")
+
+    with open(PWD_FILE, "r", encoding='utf-8') as f:
+        current_hash = f.read().strip()
+        
+    if hashlib.sha256(old_p.encode('utf-8')).hexdigest() != current_hash:
+        return render_template('index.html', mode="dashboard", files=files, error="INCORRECT CURRENT ACCESS KEY!")
+
+    with open(PWD_FILE, "w", encoding='utf-8') as f:
+        f.write(hashlib.sha256(new_p.encode('utf-8')).hexdigest())
+        
+    return render_template('index.html', mode="dashboard", files=files, msg="MASTER ACCESS KEY ROTATED SUCCESSFULLY!")
 
 @app.route('/logout')
 def logout():
