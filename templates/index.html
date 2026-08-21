@@ -75,7 +75,7 @@
         input[type="password"], input[type="file"] {
             width: 100%;
             padding: 15px;
-            margin: 15px 0;
+            margin: 10px 0;
             background: var(--glass);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
@@ -102,8 +102,7 @@
             cursor: pointer;
             border-radius: 8px;
             transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            margin-top: 5px;
         }
 
         .btn:hover {
@@ -112,15 +111,10 @@
             box-shadow: 0 0 20px var(--neon-blue);
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .file-list {
-            margin-top: 30px;
+            margin-top: 25px;
             text-align: left;
-            max-height: 180px;
+            max-height: 160px;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -129,12 +123,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
+            padding: 10px 12px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 13px;
+            margin-bottom: 8px;
+            font-size: 12px;
         }
 
         .file-item span {
@@ -142,7 +136,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 180px;
+            max-width: 220px;
         }
 
         .decrypt-btn {
@@ -171,16 +165,53 @@
             border: 1px solid rgba(255, 75, 92, 0.2);
         }
 
-        .logout {
+        .success-msg {
+            color: #3fb950;
+            font-size: 12px;
+            background: rgba(63, 185, 80, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(63, 185, 80, 0.2);
+        }
+
+        .bottom-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 25px;
-            display: inline-block;
-            color: #4a5568;
             font-size: 11px;
+        }
+
+        .nav-link {
+            color: #4a5568;
             text-decoration: none;
+            cursor: pointer;
             transition: 0.3s;
         }
 
-        .logout:hover { color: var(--neon-pink); }
+        .nav-link:hover { color: var(--neon-pink); }
+
+        /* Settings Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 360px;
+            background: var(--card-bg);
+            border: 1px solid var(--neon-pink);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.2);
+            text-align: center;
+        }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
@@ -192,6 +223,9 @@
     <div class="logo">AADI_VAULT</div>
     <div class="sub-tag">CYBERNETIC ENCRYPTION v2.0</div>
 
+    {% if msg %}<div class="success-msg">{{ msg }}</div>{% endif %}
+    {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+
     {% if mode == "setup" %}
         <p style="font-size: 13px; color: #718096;">[ SYSTEM INITIALIZATION REQUIRED ]</p>
         <form action="/gatekeeper" method="POST" onsubmit="handleLoading(this)">
@@ -200,7 +234,6 @@
         </form>
 
     {% elif mode == "login" %}
-        {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
         <form action="/gatekeeper" method="POST" onsubmit="handleLoading(this)">
             <input type="password" name="master_key_field" placeholder="ENTER ACCESS KEY" required>
             <button type="submit" class="btn">AUTHORIZE ACCESS</button>
@@ -226,18 +259,42 @@
             {% endif %}
         </div>
 
-        <a href="/logout" class="logout">TERMINATE_SESSION_</a>
+        <div class="bottom-links">
+            <span class="nav-link" onclick="openResetModal()">[ RESET_KEY ]</span>
+            <a href="/logout" class="nav-link">TERMINATE_SESSION_</a>
+        </div>
     {% endif %}
+</div>
+
+<!-- Password Reset Modal -->
+<div id="resetModal" class="modal">
+    <div class="modal-content">
+        <div class="logo" style="font-size: 20px; margin-bottom: 15px;">KEY_ROTATION</div>
+        <form action="/reset-password" method="POST">
+            <input type="password" name="old_password" placeholder="CURRENT MASTER KEY" required>
+            <input type="password" name="new_password" placeholder="NEW MASTER KEY" required>
+            <input type="password" name="confirm_password" placeholder="CONFIRM NEW KEY" required>
+            <button type="submit" class="btn" style="border-color: var(--neon-pink); color: var(--neon-pink); margin-top: 10px;">UPDATE KEY</button>
+            <button type="button" class="btn" onclick="closeResetModal()" style="border-color: #4a5568; color: #a0aec0; margin-top: 8px;">CANCEL</button>
+        </form>
+    </div>
 </div>
 
 <script>
     function handleLoading(form) {
         const btn = form.querySelector('.btn');
-        btn.disabled = true;
         btn.innerText = "PROCESSING...";
         btn.style.boxShadow = "0 0 20px var(--neon-pink)";
         btn.style.borderColor = "var(--neon-pink)";
         btn.style.color = "var(--neon-pink)";
+    }
+
+    function openResetModal() {
+        document.getElementById('resetModal').style.display = 'flex';
+    }
+
+    function closeResetModal() {
+        document.getElementById('resetModal').style.display = 'none';
     }
 </script>
 
