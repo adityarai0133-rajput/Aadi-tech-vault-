@@ -1,4 +1,4 @@
-name: Build and Deploy AadiTechVault Installer
+name: Build, Sign and Deploy AadiTechVault Installer
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller pycryptodome flask pywebview
+          pip install pyinstaller pycryptodome flask
 
       - name: Build Windows Executable
         shell: pwsh
@@ -54,12 +54,10 @@ jobs:
                  "$iconArg " +
                  "--collect-all Crypto " +
                  "--collect-all flask " +
-                 "--collect-all webview " +
                  "--hidden-import=Crypto " +
                  "--hidden-import=Crypto.Cipher.AES " +
                  "--hidden-import=Crypto.Random " +
                  "--hidden-import=Crypto.Util.Padding " +
-                 "--hidden-import=webview " +
                  "$addTemplateArg " +
                  "--name app app.py"
 
@@ -68,14 +66,14 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
 
-      - name: Generate Microsoft Store Compliant Inno Script
+      - name: Generate Microsoft Store Inno Script
         shell: pwsh
         run: |
           $iss = @"
           [Setup]
           AppName=Aadi Vault
           AppVersion=1.0.0
-          AppPublisher=Aditya Rai
+          AppPublisher=Aditya Rai (kyxgo)
           DefaultDirName={autopf}\Aadi Vault
           DefaultGroupName=Aadi Vault
           UninstallDisplayIcon={app}\app.exe
@@ -106,6 +104,20 @@ jobs:
       - name: Compile Inno Setup Installer
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      - name: Generate Certificate and Digitally Sign Installer
+        shell: pwsh
+        run: |
+          # Create SHA256 Code Signing Certificate matching Publisher
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Aditya Rai (kyxgo)" -CertStoreLocation Cert:\CurrentUser\My -HashAlgorithm SHA256
+          $pwd = ConvertTo-SecureString -String "KyxgoVault2026" -Force -AsPlainText
+          Export-PfxCertificate -Cert $cert -FilePath "signer.pfx" -Password $pwd
+          
+          # Find official Windows SignTool and Sign the Executable
+          $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "x64" } | Select-Object -First 1).FullName
+          if ($signtool) {
+              & $signtool sign /f "signer.pfx" /p "KyxgoVault2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "public\AadiVault.exe"
+          }
 
       - name: Create Index HTML for Auto-Download
         shell: pwsh
